@@ -18,7 +18,20 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp"
+        android:visibility="gone"/>
+
+    <EditText
+        android:id="@+id/responseEditText"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="top"
+        android:hint="Escribe tu respuesta aquí..."
+        android:inputType="textMultiLine"
+        android:background="@android:drawable/edit_text"
+        android:padding="8dp"
+        android:visibility="gone"/>
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -26,8 +39,8 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         style="?android:attr/progressBarStyleHorizontal"
-        android:max="100"
-        android:progress="50"/>
+        android:max="9"
+        android:progress="0"/>
 
     <Button
         android:id="@+id/continueButton"
