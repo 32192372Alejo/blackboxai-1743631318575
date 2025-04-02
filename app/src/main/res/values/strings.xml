@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Interview Simulator</string>
+    <string name="start_interview">Start Interview</string>
+    <string name="text_response">Text Response</string>
+</resources>
