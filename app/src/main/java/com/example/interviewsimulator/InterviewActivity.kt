@@ -3,7 +3,10 @@ package com.example.interviewsimulator
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
+import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +22,22 @@ import java.util.concurrent.Executors
 class InterviewActivity : AppCompatActivity() {
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var viewFinder: PreviewView
+    private lateinit var responseEditText: EditText
+    private lateinit var progressBar: ProgressBar
+    private var currentQuestionIndex = 0
+    
+    private val questions = listOf(
+        "¿Por qué quieres trabajar aquí?",
+        "¿Cuál es tu experiencia previa en este campo?",
+        "¿Cuáles son tus fortalezas y debilidades?",
+        "¿Dónde te ves en 5 años?",
+        "¿Por qué deberíamos contratarte?",
+        "¿Cómo manejas el trabajo bajo presión?",
+        "¿Cuál ha sido tu mayor logro profesional?",
+        "¿Qué sabes sobre nuestra empresa?",
+        "¿Qué te motiva en tu trabajo?",
+        "¿Tienes alguna pregunta para nosotros?"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,23 +45,52 @@ class InterviewActivity : AppCompatActivity() {
 
         val responseType = intent.getStringExtra("responseType")
         viewFinder = findViewById(R.id.viewFinder)
+        responseEditText = findViewById(R.id.responseEditText)
+        progressBar = findViewById(R.id.progressBar)
 
         val questionTextView: TextView = findViewById(R.id.questionTextView)
         val continueButton: Button = findViewById(R.id.continueButton)
 
-        // Set the question based on your logic
-        questionTextView.text = "¿Por qué quieres trabajar aquí?"
+        // Set visibility based on response type
+        if (responseType == "camera") {
+            viewFinder.visibility = View.VISIBLE
+            responseEditText.visibility = View.GONE
+            checkCameraPermission()
+        } else {
+            viewFinder.visibility = View.GONE
+            responseEditText.visibility = View.VISIBLE
+        }
+
+        // Initialize first question and progress
+        updateQuestion()
 
         continueButton.setOnClickListener {
-            if (responseType == "camera") {
-                checkCameraPermission()
+            if (responseType != "camera" && responseEditText.text.toString().trim().isEmpty()) {
+                Toast.makeText(this, "Por favor, escribe tu respuesta", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (currentQuestionIndex < questions.size - 1) {
+                currentQuestionIndex++
+                updateQuestion()
+                responseEditText.text.clear()
             } else {
-                // Handle text response
-                Toast.makeText(this, "Respondiendo con texto...", Toast.LENGTH_SHORT).show()
+                // Interview finished
+                Toast.makeText(this, "¡Entrevista completada!", Toast.LENGTH_LONG).show()
+                finish()
             }
         }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
+    }
+
+    private fun updateQuestion() {
+        val questionTextView: TextView = findViewById(R.id.questionTextView)
+        questionTextView.text = questions[currentQuestionIndex]
+        
+        // Update progress bar
+        progressBar.max = questions.size - 1
+        progressBar.progress = currentQuestionIndex
     }
 
     private fun checkCameraPermission() {
@@ -71,8 +119,6 @@ class InterviewActivity : AppCompatActivity() {
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(
                     this, cameraSelector, preview)
-                
-                Toast.makeText(this, "Cámara iniciada", Toast.LENGTH_SHORT).show()
             } catch(exc: Exception) {
                 Toast.makeText(this, "Error al iniciar la cámara: ${exc.message}", Toast.LENGTH_SHORT).show()
             }
