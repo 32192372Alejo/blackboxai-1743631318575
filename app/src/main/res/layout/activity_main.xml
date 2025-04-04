@@ -4,27 +4,44 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/background_color">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Inicio de Entrevista"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_color"
+        android:layout_marginTop="48dp"
+        android:layout_marginBottom="16dp"/>
 
     <TextView
         android:id="@+id/titleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Inicio de Entrevista: ADMINISTRACION DE EMPRESAS"
-        android:textSize="24sp"
+        android:text="INGENIERO DE SOFTWARE"
+        android:textSize="28sp"
         android:textStyle="bold"
-        android:layout_marginBottom="24dp"/>
+        android:textColor="@color/text_color"
+        android:layout_marginBottom="64dp"
+        android:gravity="center"/>
 
     <Button
         android:id="@+id/startInterviewButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Responder con cámara"
+        android:backgroundTint="@color/button_color"
+        android:textColor="@color/text_color"
         android:layout_marginBottom="16dp"/>
 
     <Button
         android:id="@+id/textResponseButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Responder con cuadro de texto"/>
+        android:text="Responder con cuadro de texto"
+        android:backgroundTint="@color/button_color"
+        android:textColor="@color/text_color"/>
 </LinearLayout>
