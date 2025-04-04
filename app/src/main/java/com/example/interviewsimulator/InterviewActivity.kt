@@ -11,6 +11,7 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -19,7 +20,6 @@ import androidx.camera.video.VideoCapture
 import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.PermissionChecker
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
@@ -58,13 +58,11 @@ class InterviewActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progressBar)
         continueButton = findViewById(R.id.continueButton)
 
-        val questionTextView: TextView = findViewById(R.id.questionTextView)
-
         // Set visibility based on response type
         if (responseType == "camera") {
             viewFinder.visibility = View.VISIBLE
             responseEditText.visibility = View.GONE
-            checkCameraPermission()
+            showRecordingConfirmationDialog()
             continueButton.text = "Iniciar Grabación"
         } else {
             viewFinder.visibility = View.GONE
@@ -106,6 +104,20 @@ class InterviewActivity : AppCompatActivity() {
         }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
+    }
+
+    private fun showRecordingConfirmationDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Confirmación")
+            .setMessage("¿Estás seguro de que deseas comenzar la entrevista con grabación de video?")
+            .setPositiveButton("Sí") { _, _ ->
+                checkCameraPermission()
+            }
+            .setNegativeButton("No") { _, _ ->
+                finish()
+            }
+            .setCancelable(false)
+            .show()
     }
 
     private fun startRecording() {
@@ -161,7 +173,8 @@ class InterviewActivity : AppCompatActivity() {
     private fun checkCameraPermission() {
         val permissions = arrayOf(
             Manifest.permission.CAMERA,
-            Manifest.permission.RECORD_AUDIO
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
         )
         
         if (permissions.all { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }) {
