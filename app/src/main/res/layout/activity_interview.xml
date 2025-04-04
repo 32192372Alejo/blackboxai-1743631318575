@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/background_color">
 
     <TextView
         android:id="@+id/questionTextView"
@@ -11,7 +12,17 @@
         android:layout_height="wrap_content"
         android:text="Pregunta aquí"
         android:textSize="20sp"
+        android:textColor="@color/text_color"
         android:layout_marginBottom="16dp"/>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:max="9"
+        android:progress="0"/>
 
     <androidx.camera.view.PreviewView
         android:id="@+id/viewFinder"
@@ -25,26 +36,22 @@
         android:id="@+id/responseEditText"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="0.5"
         android:gravity="top"
         android:hint="Escribe tu respuesta aquí..."
+        android:textColorHint="@color/text_color"
+        android:textColor="@color/text_color"
         android:inputType="textMultiLine"
         android:background="@android:drawable/edit_text"
         android:padding="8dp"
         android:visibility="gone"/>
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:max="9"
-        android:progress="0"/>
-
     <Button
         android:id="@+id/continueButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Continuar"/>
+        android:text="Continuar"
+        android:backgroundTint="@color/button_color"
+        android:textColor="@color/text_color"
+        android:layout_marginTop="16dp"/>
 </LinearLayout>
