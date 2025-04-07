@@ -11,7 +11,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Pregunta aquí"
-        android:textSize="20sp"
+        android:textSize="22sp"
+        android:textStyle="bold"
         android:textColor="@color/text_color"
         android:layout_gravity="center"
         android:layout_marginBottom="16dp"/>
@@ -36,20 +37,25 @@
     <EditText
         android:id="@+id/responseEditText"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="150dp"
         android:layout_gravity="center"
         android:gravity="top"
         android:hint="Escribe tu respuesta aquí..."
-        android:textColor="#00FF00" <!-- Color fosforescente -->
+        android:textColor="#00FF00"
         android:textColorHint="@color/text_color"
         android:inputType="textMultiLine"
         android:background="@color/background_color"
-        android:padding="8dp"
+        android:padding="12dp"
         android:textSize="18sp"
         android:visibility="gone"
         android:singleLine="false"
         android:lines="4"
         android:maxLines="4"/>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
     <Button
         android:id="@+id/continueButton"
@@ -58,5 +64,5 @@
         android:text="Continuar"
         android:backgroundTint="@color/button_color"
         android:textColor="@color/text_color"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="8dp"/>
 </LinearLayout>
