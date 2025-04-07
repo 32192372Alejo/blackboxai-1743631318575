@@ -6,6 +6,11 @@
     android:padding="16dp"
     android:background="@color/background_color">
 
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
     <TextView
         android:id="@+id/questionTextView"
         android:layout_width="wrap_content"
@@ -21,30 +26,30 @@
         android:id="@+id/progressBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="24dp"
         style="?android:attr/progressBarStyleHorizontal"
         android:max="9"
         android:progress="0"/>
 
     <androidx.camera.view.PreviewView
         android:id="@+id/viewFinder"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginBottom="16dp"
+        android:layout_width="300dp"
+        android:layout_height="400dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="24dp"
         android:visibility="gone"/>
 
     <EditText
         android:id="@+id/responseEditText"
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_width="300dp"
+        android:layout_height="200dp"
         android:layout_gravity="center"
         android:gravity="top"
         android:hint="Escribe tu respuesta aquí..."
         android:textColor="#00FF00"
         android:textColorHint="@color/text_color"
         android:inputType="textMultiLine"
-        android:background="@color/background_color"
+        android:background="#1E2A32"
         android:padding="12dp"
         android:textSize="18sp"
         android:visibility="gone"
@@ -55,14 +60,16 @@
     <Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="0.5"/>
 
     <Button
         android:id="@+id/continueButton"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Continuar"
         android:backgroundTint="@color/button_color"
         android:textColor="@color/text_color"
-        android:layout_marginTop="8dp"/>
+        android:layout_gravity="center"
+        android:layout_marginTop="8dp"
+        android:minWidth="200dp"/>
 </LinearLayout>
