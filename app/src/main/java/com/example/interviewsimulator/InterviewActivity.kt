@@ -37,16 +37,16 @@ class InterviewActivity : AppCompatActivity() {
     private var responseType: String? = null
     
     private val questions = listOf(
-        "¿Por qué quieres trabajar aquí?",
-        "¿Cuál es tu experiencia previa en este campo?",
-        "¿Cuáles son tus fortalezas y debilidades?",
-        "¿Dónde te ves en 5 años?",
-        "¿Por qué deberíamos contratarte?",
-        "¿Cómo manejas el trabajo bajo presión?",
-        "¿Cuál ha sido tu mayor logro profesional?",
-        "¿Qué sabes sobre nuestra empresa?",
-        "¿Qué te motiva en tu trabajo?",
-        "¿Tienes alguna pregunta para nosotros?"
+        "¿Qué te motivó a estudiar ingeniería de sistemas?",
+        "¿Cuál es tu lenguaje de programación favorito y por qué?",
+        "Describe un proyecto técnico del que estés orgulloso",
+        "¿Cómo manejas los plazos ajustados en proyectos de desarrollo?",
+        "¿Qué metodologías de desarrollo de software conoces?",
+        "Explica cómo resolverías un problema complejo de programación",
+        "¿Cómo te mantienes actualizado con las nuevas tecnologías?",
+        "Describe tu experiencia trabajando en equipo en proyectos técnicos",
+        "¿Qué área de la ingeniería de sistemas te apasiona más?",
+        "¿Tienes experiencia con desarrollo de aplicaciones móviles?"
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,7 +59,6 @@ class InterviewActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progressBar)
         continueButton = findViewById(R.id.continueButton)
 
-        // Set visibility based on response type
         if (responseType == "camera") {
             viewFinder.visibility = View.VISIBLE
             responseEditText.visibility = View.GONE
@@ -70,7 +69,6 @@ class InterviewActivity : AppCompatActivity() {
             responseEditText.visibility = View.VISIBLE
         }
 
-        // Initialize first question and progress
         updateQuestion()
 
         continueButton.setOnClickListener {
@@ -107,6 +105,13 @@ class InterviewActivity : AppCompatActivity() {
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
+    private fun updateQuestion() {
+        val questionTextView: TextView = findViewById(R.id.questionTextView)
+        questionTextView.text = questions[currentQuestionIndex]
+        progressBar.max = questions.size - 1
+        progressBar.progress = currentQuestionIndex
+    }
+
     private fun checkCameraPermission() {
         val permissions = arrayOf(
             Manifest.permission.CAMERA,
@@ -122,92 +127,61 @@ class InterviewActivity : AppCompatActivity() {
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-
         cameraProviderFuture.addListener({
             try {
-                val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-
-                val preview = Preview.Builder()
-                    .build()
-                    .also {
-                        it.setSurfaceProvider(viewFinder.surfaceProvider)
-                    }
-
+                val cameraProvider = cameraProviderFuture.get()
+                val preview = Preview.Builder().build().also {
+                    it.setSurfaceProvider(viewFinder.surfaceProvider)
+                }
                 val recorder = Recorder.Builder()
                     .setQualitySelector(QualitySelector.from(Quality.HIGHEST))
                     .build()
                 videoCapture = VideoCapture.withOutput(recorder)
-
                 val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
-
                 cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(
-                    this,
-                    cameraSelector,
-                    preview,
-                    videoCapture
-                )
+                cameraProvider.bindToLifecycle(this, cameraSelector, preview, videoCapture)
             } catch(exc: Exception) {
-                Toast.makeText(this, "Error al iniciar la cámara: ${exc.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Error al iniciar la cámara", Toast.LENGTH_SHORT).show()
                 finish()
             }
         }, ContextCompat.getMainExecutor(this))
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 100) {
             if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
                 startCamera()
             } else {
-                if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA) || 
-                    shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)) {
-                    showPermissionExplanationDialog()
-                } else {
-                    Toast.makeText(this, "Permisos denegados permanentemente. Por favor, habilítalos en Configuración", Toast.LENGTH_LONG).show()
-                    finish()
-                }
-            }
-        }
-    }
-
-    private fun showPermissionExplanationDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Permisos requeridos")
-            .setMessage("La aplicación necesita acceso a la cámara y micrófono para grabar respuestas. Por favor, otorga los permisos para continuar.")
-            .setPositiveButton("Intentar de nuevo") { _, _ ->
-                checkCameraPermission()
-            }
-            .setNegativeButton("Cancelar") { _, _ ->
+                Toast.makeText(this, "Se requieren permisos de cámara y audio", Toast.LENGTH_SHORT).show()
                 finish()
             }
-            .show()
+        }
     }
 
     private fun startRecording() {
         val videoCapture = this.videoCapture ?: return
         continueButton.text = "Detener Grabación"
-
         val name = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.getDefault())
             .format(System.currentTimeMillis())
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
         }
-
         val mediaStoreOutputOptions = MediaStoreOutputOptions
             .Builder(contentResolver, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
             .setContentValues(contentValues)
             .build()
-
         recording = videoCapture.output
             .prepareRecording(this, mediaStoreOutputOptions)
             .apply { withAudioEnabled() }
             .start(ContextCompat.getMainExecutor(this)) { recordEvent ->
                 when(recordEvent) {
-                    is VideoRecordEvent.Start -> {
-                        Toast.makeText(this, "Grabación iniciada", Toast.LENGTH_SHORT).show()
-                    }
+                    is VideoRecordEvent.Start -> Toast.makeText(this, "Grabación iniciada", Toast.LENGTH_SHORT).show()
                     is VideoRecordEvent.Finalize -> {
                         if (!recordEvent.hasError()) {
                             Toast.makeText(this, "Grabación guardada", Toast.LENGTH_SHORT).show()
@@ -224,14 +198,6 @@ class InterviewActivity : AppCompatActivity() {
     private fun stopRecording() {
         recording?.stop()
         recording = null
-    }
-
-    private fun updateQuestion() {
-        val questionTextView: TextView = findViewById(R.id.questionTextView)
-        questionTextView.text = questions[currentQuestionIndex]
-        
-        progressBar.max = questions.size - 1
-        progressBar.progress = currentQuestionIndex
     }
 
     override fun onDestroy() {
