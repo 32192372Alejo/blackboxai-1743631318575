@@ -6,20 +6,17 @@
     android:padding="16dp"
     android:background="@color/background_color">
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
-
+    <!-- Camera Mode Layout -->
     <TextView
         android:id="@+id/questionTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Pregunta aquí"
         android:textSize="22sp"
         android:textStyle="bold"
         android:textColor="@color/text_color"
-        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"/>
 
     <ProgressBar
@@ -36,14 +33,16 @@
         android:layout_width="300dp"
         android:layout_height="400dp"
         android:layout_gravity="center"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="16dp"
         android:visibility="gone"/>
 
+    <!-- Text Mode Layout -->
     <EditText
         android:id="@+id/responseEditText"
         android:layout_width="300dp"
         android:layout_height="200dp"
         android:layout_gravity="center"
+        android:layout_marginTop="16dp"
         android:gravity="top"
         android:hint="Escribe tu respuesta aquí..."
         android:textColor="#00FF00"
@@ -57,11 +56,6 @@
         android:lines="4"
         android:maxLines="4"/>
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.5"/>
-
     <Button
         android:id="@+id/continueButton"
         android:layout_width="wrap_content"
@@ -70,6 +64,7 @@
         android:backgroundTint="@color/button_color"
         android:textColor="@color/text_color"
         android:layout_gravity="center"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
         android:minWidth="200dp"/>
 </LinearLayout>
