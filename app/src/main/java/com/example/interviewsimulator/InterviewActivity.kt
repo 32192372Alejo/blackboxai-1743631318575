@@ -34,6 +34,7 @@ class InterviewActivity : AppCompatActivity() {
     private var currentQuestionIndex = 0
     private var videoCapture: VideoCapture<Recorder>? = null
     private var recording: Recording? = null
+    private var responseType: String? = null
     
     private val questions = listOf(
         "¿Por qué quieres trabajar aquí?",
@@ -52,7 +53,7 @@ class InterviewActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_interview)
 
-        val responseType = intent.getStringExtra("responseType")
+        responseType = intent.getStringExtra("responseType")
         viewFinder = findViewById(R.id.viewFinder)
         responseEditText = findViewById(R.id.responseEditText)
         progressBar = findViewById(R.id.progressBar)
@@ -188,22 +189,22 @@ class InterviewActivity : AppCompatActivity() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
         cameraProviderFuture.addListener({
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-
-            val preview = Preview.Builder()
-                .build()
-                .also {
-                    it.setSurfaceProvider(viewFinder.surfaceProvider)
-                }
-
-            val recorder = Recorder.Builder()
-                .setQualitySelector(QualitySelector.from(Quality.HIGHEST))
-                .build()
-            videoCapture = VideoCapture.withOutput(recorder)
-
-            val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
-
             try {
+                val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+
+                val preview = Preview.Builder()
+                    .build()
+                    .also {
+                        it.setSurfaceProvider(viewFinder.surfaceProvider)
+                    }
+
+                val recorder = Recorder.Builder()
+                    .setQualitySelector(QualitySelector.from(Quality.HIGHEST))
+                    .build()
+                videoCapture = VideoCapture.withOutput(recorder)
+
+                val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(
                     this,
@@ -213,8 +214,8 @@ class InterviewActivity : AppCompatActivity() {
                 )
             } catch(exc: Exception) {
                 Toast.makeText(this, "Error al iniciar la cámara: ${exc.message}", Toast.LENGTH_SHORT).show()
+                finish()
             }
-
         }, ContextCompat.getMainExecutor(this))
     }
 
@@ -224,8 +225,10 @@ class InterviewActivity : AppCompatActivity() {
             if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
                 startCamera()
             } else {
-                Toast.makeText(this, "Se requieren permisos de cámara y audio", Toast.LENGTH_SHORT).show()
-                finish()
+                Toast.makeText(this, "Permisos requeridos no concedidos", Toast.LENGTH_SHORT).show()
+                if (responseType == "camera") {
+                    finish()
+                }
             }
         }
     }
