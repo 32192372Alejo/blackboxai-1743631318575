@@ -63,7 +63,7 @@ class InterviewActivity : AppCompatActivity() {
         if (responseType == "camera") {
             viewFinder.visibility = View.VISIBLE
             responseEditText.visibility = View.GONE
-            showRecordingConfirmationDialog()
+            checkCameraPermission()
             continueButton.text = "Iniciar Grabación"
         } else {
             viewFinder.visibility = View.GONE
@@ -107,17 +107,80 @@ class InterviewActivity : AppCompatActivity() {
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
-    private fun showRecordingConfirmationDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Confirmación")
-            .setMessage("¿Estás seguro de que deseas comenzar la entrevista con grabación de video?")
-            .setPositiveButton("Sí") { _, _ ->
-                checkCameraPermission()
-            }
-            .setNegativeButton("No") { _, _ ->
+    private fun checkCameraPermission() {
+        val permissions = arrayOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.RECORD_AUDIO
+        )
+        
+        if (permissions.all { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }) {
+            startCamera()
+        } else {
+            ActivityCompat.requestPermissions(this, permissions, 100)
+        }
+    }
+
+    private fun startCamera() {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+
+        cameraProviderFuture.addListener({
+            try {
+                val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+
+                val preview = Preview.Builder()
+                    .build()
+                    .also {
+                        it.setSurfaceProvider(viewFinder.surfaceProvider)
+                    }
+
+                val recorder = Recorder.Builder()
+                    .setQualitySelector(QualitySelector.from(Quality.HIGHEST))
+                    .build()
+                videoCapture = VideoCapture.withOutput(recorder)
+
+                val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+
+                cameraProvider.unbindAll()
+                cameraProvider.bindToLifecycle(
+                    this,
+                    cameraSelector,
+                    preview,
+                    videoCapture
+                )
+            } catch(exc: Exception) {
+                Toast.makeText(this, "Error al iniciar la cámara: ${exc.message}", Toast.LENGTH_SHORT).show()
                 finish()
             }
-            .setCancelable(false)
+        }, ContextCompat.getMainExecutor(this))
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 100) {
+            if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+                startCamera()
+            } else {
+                if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA) || 
+                    shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)) {
+                    showPermissionExplanationDialog()
+                } else {
+                    Toast.makeText(this, "Permisos denegados permanentemente. Por favor, habilítalos en Configuración", Toast.LENGTH_LONG).show()
+                    finish()
+                }
+            }
+        }
+    }
+
+    private fun showPermissionExplanationDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Permisos requeridos")
+            .setMessage("La aplicación necesita acceso a la cámara y micrófono para grabar respuestas. Por favor, otorga los permisos para continuar.")
+            .setPositiveButton("Intentar de nuevo") { _, _ ->
+                checkCameraPermission()
+            }
+            .setNegativeButton("Cancelar") { _, _ ->
+                finish()
+            }
             .show()
     }
 
@@ -169,68 +232,6 @@ class InterviewActivity : AppCompatActivity() {
         
         progressBar.max = questions.size - 1
         progressBar.progress = currentQuestionIndex
-    }
-
-    private fun checkCameraPermission() {
-        val permissions = arrayOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        )
-        
-        if (permissions.all { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }) {
-            startCamera()
-        } else {
-            ActivityCompat.requestPermissions(this, permissions, 100)
-        }
-    }
-
-    private fun startCamera() {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-
-        cameraProviderFuture.addListener({
-            try {
-                val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-
-                val preview = Preview.Builder()
-                    .build()
-                    .also {
-                        it.setSurfaceProvider(viewFinder.surfaceProvider)
-                    }
-
-                val recorder = Recorder.Builder()
-                    .setQualitySelector(QualitySelector.from(Quality.HIGHEST))
-                    .build()
-                videoCapture = VideoCapture.withOutput(recorder)
-
-                val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
-
-                cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(
-                    this,
-                    cameraSelector,
-                    preview,
-                    videoCapture
-                )
-            } catch(exc: Exception) {
-                Toast.makeText(this, "Error al iniciar la cámara: ${exc.message}", Toast.LENGTH_SHORT).show()
-                finish()
-            }
-        }, ContextCompat.getMainExecutor(this))
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 100) {
-            if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-                startCamera()
-            } else {
-                Toast.makeText(this, "Permisos requeridos no concedidos", Toast.LENGTH_SHORT).show()
-                if (responseType == "camera") {
-                    finish()
-                }
-            }
-        }
     }
 
     override fun onDestroy() {
